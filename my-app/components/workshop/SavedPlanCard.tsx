@@ -18,9 +18,6 @@ export default function SavedPlanCard({ plan, onDelete }: Props) {
               </span>
             ))}
           </div>
-          {plan.integrated_standard && (
-            <p className="text-xs text-gray-500 line-clamp-2">{plan.integrated_standard}</p>
-          )}
           <p className="text-xs text-gray-400 mt-2">
             {new Date(plan.created_at).toLocaleDateString('ko-KR')}
           </p>
