@@ -40,9 +40,6 @@ export default async function WorkshopPage() {
                   </span>
                 ))}
               </div>
-              {plan.integrated_standard && (
-                <p className="text-sm text-gray-600 mb-2 leading-relaxed">{plan.integrated_standard}</p>
-              )}
               {plan.key_activities && (
                 <div className="mb-2">
                   <span className="text-xs font-medium text-gray-400">핵심 활동</span>
