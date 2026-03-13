@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import SelectedCriteriaList from './SelectedCriteriaList'
 import LessonForm from './LessonForm'
 import SavedPlanCard from './SavedPlanCard'
+import PlanDetailModal from './PlanDetailModal'
 import type { Criteria, LessonPlan } from '@/types'
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
   savedPlans: LessonPlan[]
   onFetchPlans: () => Promise<void>
   onSavePlan: (plan: Omit<LessonPlan, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<{ error?: string }>
+  onUpdatePlan: (id: string, plan: Omit<LessonPlan, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<{ error?: string }>
   onDeletePlan: (id: string) => Promise<void>
 }
 
@@ -22,10 +24,11 @@ type Tab = 'write' | 'saved'
 export default function WorkshopPanel({
   isOpen, onClose,
   selectedCriteria, onToggleCriteria,
-  savedPlans, onFetchPlans, onSavePlan, onDeletePlan,
+  savedPlans, onFetchPlans, onSavePlan, onUpdatePlan, onDeletePlan,
 }: Props) {
   const [tab, setTab] = useState<Tab>('write')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [modalPlan, setModalPlan] = useState<{ plan: LessonPlan; mode: 'view' | 'edit' } | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -106,10 +109,7 @@ export default function WorkshopPanel({
                     ) : (
                       <div className="text-center py-6 bg-gray-50 rounded-xl border border-gray-200">
                         <p className="text-sm text-gray-600 mb-3">계획서를 저장하려면 로그인이 필요합니다.</p>
-                        <a
-                          href="/auth/login"
-                          className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors"
-                        >
+                        <a href="/auth/login" className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
                           로그인하기
                         </a>
                       </div>
@@ -139,7 +139,13 @@ export default function WorkshopPanel({
               ) : (
                 <div className="space-y-3">
                   {savedPlans.map(plan => (
-                    <SavedPlanCard key={plan.id} plan={plan} onDelete={onDeletePlan} />
+                    <SavedPlanCard
+                      key={plan.id}
+                      plan={plan}
+                      onView={p => setModalPlan({ plan: p, mode: 'view' })}
+                      onEdit={p => setModalPlan({ plan: p, mode: 'edit' })}
+                      onDelete={onDeletePlan}
+                    />
                   ))}
                 </div>
               )}
@@ -147,6 +153,18 @@ export default function WorkshopPanel({
           )}
         </div>
       </div>
+
+      {modalPlan && (
+        <PlanDetailModal
+          plan={modalPlan.plan}
+          onClose={() => setModalPlan(null)}
+          onUpdate={async (id, data) => {
+            const result = await onUpdatePlan(id, data)
+            if (!result.error) setModalPlan(null)
+            return result
+          }}
+        />
+      )}
     </>
   )
 }

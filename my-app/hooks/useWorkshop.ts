@@ -31,6 +31,15 @@ export function useWorkshop() {
     return { error: error?.message }
   }
 
+  const updatePlan = async (
+    id: string,
+    plan: Omit<LessonPlan, 'id' | 'user_id' | 'created_at' | 'updated_at'>
+  ) => {
+    const { error } = await supabase.from('lesson_plans').update(plan).eq('id', id)
+    if (!error) await fetchPlans()
+    return { error: error?.message }
+  }
+
   const deletePlan = async (id: string) => {
     await supabase.from('lesson_plans').delete().eq('id', id)
     setSavedPlans(prev => prev.filter(p => p.id !== id))
@@ -50,6 +59,7 @@ export function useWorkshop() {
     savedPlans,
     fetchPlans,
     savePlan,
+    updatePlan,
     deletePlan,
     isPanelOpen,
     setIsPanelOpen,

@@ -100,6 +100,7 @@ export default function CriteriaExplorer({ subjects }: Props) {
         savedPlans={workshop.savedPlans}
         onFetchPlans={workshop.fetchPlans}
         onSavePlan={workshop.savePlan}
+        onUpdatePlan={workshop.updatePlan}
         onDeletePlan={workshop.deletePlan}
       />
     </div>
